@@ -5,14 +5,18 @@ const userSchema = new mongoose.Schema({
   email: { type: String, unique: true },
   password: String,
   role: { type: String, default: "EMPLOYEE" },
+  permissions: [String],
   organizationId: { type: mongoose.Schema.Types.ObjectId, ref: "Organization" },
-  inviteToken: String,
-  inviteExpires: Date,
-  isOnboarded: { type: Boolean, default: false },
-  isEmailVerified: { type: Boolean, default: false },
-  lastLoginAt: Date,
-  failedLoginAttempts: { type: Number, default: 0 }
-}, { timestamps: true });
 
+  // For Part B
+  lastLoginAt: Date,
+  lastLoginIP: String,
+  lastLoginUA: String,
+
+  // For Part C
+  mfaEnabled: { type: Boolean, default: false },
+  mfaCode: String,
+  mfaExpires: Date
+}, { timestamps: true });
 
 module.exports = mongoose.model("User", userSchema);

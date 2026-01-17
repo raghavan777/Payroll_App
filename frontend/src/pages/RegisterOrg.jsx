@@ -13,7 +13,7 @@ export default function RegisterOrg() {
       toast.success("Organization Registered Successfully!");
       navigate("/login");
     } catch (err) {
-        console.log(err.response?.data); // <-- shows real error
+        console.log("REGISTER ERROR:", err.response?.data || err);
         toast.error(err.response?.data?.message || "Registration failed");
     }
   };

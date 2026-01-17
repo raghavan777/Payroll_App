@@ -2,18 +2,33 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth(); // <- Use context login
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   const onSubmit = async (data) => {
     try {
       const res = await axios.post("http://localhost:5000/api/auth/login", data);
-      localStorage.setItem("token", res.data.accessToken);
+
+      const token = res.data?.accessToken;
+      if (!token) {
+        toast.error("Server didn't return a token");
+        return;
+      }
+
+      // Store & decode using AuthContext
+      login(token);
+
       toast.success("Login Successful!");
-      navigate("/dashboard");
+
+      // Navigate reliably after login
+      navigate("/dashboard", { replace: true });
+
     } catch (err) {
+      console.error("LOGIN ERROR:", err.response?.data || err);
       toast.error(err.response?.data?.message || "Login failed");
     }
   };
@@ -34,7 +49,9 @@ export default function Login() {
           placeholder="Email"
           {...register("email", { required: "Email is required" })}
         />
-        {errors.email && <p className="text-red-500 text-xs mb-2">{errors.email.message}</p>}
+        {errors.email && (
+          <p className="text-red-500 text-xs mb-2">{errors.email.message}</p>
+        )}
 
         {/* Password */}
         <input
@@ -43,7 +60,9 @@ export default function Login() {
           placeholder="Password"
           {...register("password", { required: "Password is required" })}
         />
-        {errors.password && <p className="text-red-500 text-xs mb-2">{errors.password.message}</p>}
+        {errors.password && (
+          <p className="text-red-500 text-xs mb-2">{errors.password.message}</p>
+        )}
 
         {/* Submit */}
         <button
